@@ -1,0 +1,35 @@
+- hosts: localhost
+  tasks:
+
+    - name: Deploy artifact
+      jcli_deploy:
+        jboss_home: /Users/it-ops/Documents/java_dev/server/wildfly-10.0.0.Final/
+        server_group_name: group1
+        server_mode: domain
+        artifact: demo-0.0.1-SNAPSHOT.war
+        artifact_dir: /Users/it-ops/Documents/java_dev/workspaces/workspace-sandbox/vagrant-ci/sample-code/target/
+        state: absent
+      register: hasil
+
+    - debug: var=hasil
+
+    - name: Server
+      jcli_server:
+        jboss_home: /Users/it-ops/Documents/java_dev/server/wildfly-10.0.0.Final/
+        host: master
+        server_group_name: group1
+        server_config_name: server1
+        server_socket_binding_port_offset: 20
+        state: absent
+      register: hasil
+
+    - debug: var=hasil
+
+    - name: Server group
+      jcli_servergroup:
+        jboss_home: /Users/it-ops/Documents/java_dev/server/wildfly-10.0.0.Final/
+        server_group_name: group1
+        state: absent
+      register: hasil
+
+    - debug: var=hasil

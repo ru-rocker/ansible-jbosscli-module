@@ -1,0 +1,11 @@
+- hosts: localhost
+  tasks:
+
+    - name: Server group
+      jcli_servergroup:
+        jboss_home: /Users/it-ops/Documents/java_dev/server/wildfly-10.0.0.Final/
+        server_group_name: group1
+        state: start
+      register: hasil
+
+    - debug: var=hasil
