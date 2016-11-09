@@ -30,6 +30,18 @@ There are two states for this module:
 * present: deploy ear/war
 * absent: undeploy ear/war
 
+# Play
+There are 4 play files:
+* play.yml: as a sample to create from server group to deploy war
+* play_absent.yml: as a sample to undeploy war until deleting server group
+* play_server_start_stop.yml: a sample file to start/stop server
+* play_servergroup_start_stop.yml: a sample file to start/stop all server in a server group
+
+How to run:
+
+    
+    ansible-playbook play.yml
+
 # TODO
 * Several function like creating data-source, queue or topic still has not been covered
 * Documentation in .py files
