@@ -8,7 +8,9 @@ def isServerGroupAlreadyCreated(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     cli = "/server-group=%s:query" % (data['server_group_name'])
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
-    p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
+    p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
     result , err = p.communicate()
 
     print(err)
@@ -21,14 +23,16 @@ def isServerGroupAlreadyCreated(data):
 def server_group_present(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     exists = isServerGroupAlreadyCreated(data)
+    controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
     isError = False
     hasChanged = True
     meta = {}
 
     if not exists:
-        cli1 = "/server-group=%s:add(profile=%s, socket-binding-group=%s)" % (data['server_group_name'],data['server_group_profile'],data['socket_binding_group'])
-        controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+        cli = "/server-group=%s:add(profile=%s, socket-binding-group=%s)" % (data['server_group_name'],data['server_group_profile'],data['socket_binding_group'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         meta = {"status": "OK", "response": result}
     else:
@@ -41,6 +45,9 @@ def server_group_present(data):
 def server_group_absent(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     exists = isServerGroupAlreadyCreated(data)
+    controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
     isError = False
     hasChanged = True
     meta = {}
@@ -50,9 +57,8 @@ def server_group_absent(data):
         resp = "Server group %s does not exist" % (data['server_group_name'])
         meta = {"status" : "OK", "response" : resp}
     else:
-        cli1 = "/server-group=%s:remove" % (data['server_group_name'])
-        controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+        cli = "/server-group=%s:remove" % (data['server_group_name'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         meta = {"status": "OK", "response": result}
 
@@ -61,14 +67,16 @@ def server_group_absent(data):
 def server_group_start(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
     exists = isServerGroupAlreadyCreated(data)
     isError = False
     hasChanged = True
     meta = {}
 
     if exists:
-        cli1 = "/server-group=%s:start-servers" % (data['server_group_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+        cli = "/server-group=%s:start-servers" % (data['server_group_name'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         meta = {"status": "OK", "response": result}
     else:
@@ -81,14 +89,16 @@ def server_group_start(data):
 def server_group_stop(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
     exists = isServerGroupAlreadyCreated(data)
     isError = False
     hasChanged = True
     meta = {}
 
     if exists:
-        cli1 = "/server-group=%s:stop-servers" % (data['server_group_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+        cli = "/server-group=%s:stop-servers" % (data['server_group_name'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         meta = {"status": "OK", "response": result}
     else:
@@ -124,11 +134,11 @@ def main():
             "type": "int"
         },
         "user" : {
-            "required": True
+            "required": True,
             "type": "str"
         },
         "password" : {
-            "required": True
+            "required": True,
             "type": "str"
         },
         "state": {

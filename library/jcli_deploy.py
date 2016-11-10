@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+''' deploy gagal: WFLYDC0074'''
+
 from ansible.module_utils.basic import *
 import subprocess
 import json
@@ -8,7 +10,9 @@ def isArtifactAlreadyDeployed(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     cli = "deployment-info --name=%s" % (data['artifact'])
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
-    p = subprocess.Popen(["sh", cmd, "-c", cli, controller], stdout=subprocess.PIPE)
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
+    p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
     output = p.communicate()[0]
 
     if "WFLYCTL0216" in output:
@@ -20,6 +24,8 @@ def isArtifactAlreadyDeployed(data):
 def deployment_present(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
     mode = data['server_mode']
     exists = isArtifactAlreadyDeployed(data)
     isError = False
@@ -28,19 +34,17 @@ def deployment_present(data):
 
     if not exists:
         if mode == 'standalone':
-            cli1 = "deploy %s/%s" % (data['artifact_dir'],data['artifact'])
+            cli = "deploy %s/%s" % (data['artifact_dir'],data['artifact'])
         else:
-            cli1 = "deploy %s/%s --server-groups=%s" % (data['artifact_dir'],data['artifact'],data['server_group_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+            cli = "deploy %s/%s --server-groups=%s" % (data['artifact_dir'],data['artifact'],data['server_group_name'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         meta = {"status": "OK", "response": result}
     else:
-        if mode == 'standalone':
-            cli1 = "deploy %s/%s --force" % (data['artifact_dir'],data['artifact'])
-        else:
-            cli1 = "deploy %s/%s --server-groups=%s --force" % (data['artifact_dir'],data['artifact'],data['server_group_name'])
+        cli = "deploy %s/%s --force" % (data['artifact_dir'],data['artifact']) #same behaviour between standalone and domain
 
-        p = subprocess.Popen(["sh", cmd, "-c", cli1, controller], stdout=subprocess.PIPE)
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
+
         result,err = p.communicate()
         meta = {"status" : "OK", "response" : result}
 
@@ -49,6 +53,9 @@ def deployment_present(data):
 def deployment_absent(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
+
     mode = data['server_mode']
     exists = isArtifactAlreadyDeployed(data)
     isError = False
@@ -61,11 +68,11 @@ def deployment_absent(data):
         meta = {"status" : "OK", "response" : resp}
     else:
         if mode == 'standalone':
-            cli1 = "undeploy %s" % (data['artifact'])
+            cli = "undeploy %s" % (data['artifact'])
         else:
-            cli1 = "undeploy %s --server-groups=%s" % (data['artifact'],data['server_group_name'])
+            cli = "undeploy %s --server-groups=%s" % (data['artifact'],data['server_group_name'])
 
-        p = subprocess.Popen(["sh", cmd, "-c", cli1, controller], stdout=subprocess.PIPE)
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         meta = {"status": "OK", "response": result}
 
@@ -103,11 +110,11 @@ def main():
             "type": "str"
         },
         "user" : {
-            "required": True
+            "required": True,
             "type": "str"
         },
         "password" : {
-            "required": True
+            "required": True,
             "type": "str"
         },
         "state": {

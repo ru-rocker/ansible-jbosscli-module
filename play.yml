@@ -8,7 +8,7 @@
         state: present
         user: wildfly
         password: password
-    register: hasil
+      register: hasil
 
     - debug: var=hasil
 

@@ -9,7 +9,9 @@ def isServerGroupAlreadyCreated(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     cli = "/server-group=%s:query" % (data['server_group_name'])
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
-    p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
+    p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
     result , err = p.communicate()
 
     print(err)
@@ -23,7 +25,9 @@ def isServerAlreadyCreated(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     cli = "/host=%s/server=%s:query" % (data['host'], data['server_config_name'])
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
-    p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
+    p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
     output = p.communicate()[0]
 
     if "WFLYCTL0216" in output:
@@ -34,6 +38,8 @@ def isServerAlreadyCreated(data):
 def server_present(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
     exists = isServerAlreadyCreated(data)
     isError = False
     hasChanged = True
@@ -41,13 +47,13 @@ def server_present(data):
     res = []
 
     if not exists:
-        cli1 = "/host=%s/server-config=%s:add(group=%s,socket-binding-port-offset=%s,socket-binding-group=%s)" % (data['host'],data['server_config_name'],data['server_group_name'],data['server_socket_binding_port_offset'],data['server_group_socket'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+        cli = "/host=%s/server-config=%s:add(group=%s,socket-binding-port-offset=%s,socket-binding-group=%s)" % (data['host'],data['server_config_name'],data['server_group_name'],data['server_socket_binding_port_offset'],data['server_group_socket'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         res.append(result)
 
-        cli1 = "/host=%s/server-config=%s:start" % (data['host'],data['server_config_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+        cli = "/host=%s/server-config=%s:start" % (data['host'],data['server_config_name'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         res.append(result)
 
@@ -62,6 +68,8 @@ def server_present(data):
 def server_absent(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
 
     exists = isServerAlreadyCreated(data)
     isError = False
@@ -74,19 +82,19 @@ def server_absent(data):
         resp = "Server %s does not exist" % (data['server_config_name'])
         meta = {"status" : "OK", "response" : resp}
     else:
-        cli1 = "/host=%s/server-config=%s:stop" % (data['host'],data['server_config_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+        cli = "/host=%s/server-config=%s:stop" % (data['host'],data['server_config_name'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         res.append(result)
 
         while not "STOPPED" in result:
             time.sleep(0.5)
-            cli1 = "/host=%s/server-config=%s:stop" % (data['host'],data['server_config_name'])
-            p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+            cli = "/host=%s/server-config=%s:stop" % (data['host'],data['server_config_name'])
+            p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
             result = p.communicate()[0]
 
-        cli1 = "/host=%s/server-config=%s:remove" % (data['host'],data['server_config_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+        cli = "/host=%s/server-config=%s:remove" % (data['host'],data['server_config_name'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         res.append(result)
         meta = {"status": "OK", "response": res}
@@ -96,14 +104,16 @@ def server_absent(data):
 def server_start(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
     exists = isServerAlreadyCreated(data)
     isError = False
     hasChanged = True
     meta = {}
 
     if exists:
-        cli1 = "/host=%s/server-config=%s:start" % (data['host'],data['server_config_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+        cli = "/host=%s/server-config=%s:start" % (data['host'],data['server_config_name'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         meta = {"status": "OK", "response": result}
     else:
@@ -116,14 +126,16 @@ def server_start(data):
 def server_stop(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
     exists = isServerAlreadyCreated(data)
     isError = False
     hasChanged = True
     meta = {}
 
     if exists:
-        cli1 = "/host=%s/server-config=%s:stop" % (data['host'],data['server_config_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+        cli = "/host=%s/server-config=%s:stop" % (data['host'],data['server_config_name'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         meta = {"status": "OK", "response": result}
     else:
@@ -171,11 +183,11 @@ def main():
             "type": "int"
         },
         "user" : {
-            "required": True
+            "required": True,
             "type": "str"
         },
         "password" : {
-            "required": True
+            "required": True,
             "type": "str"
         },
         "state": {

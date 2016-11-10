@@ -8,7 +8,9 @@ def isJvmAlreadyCreated(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     cli = "/host=%s/server-config=%s/jvm=%s:query" % (data['host'], data['server_config_name'], data['jvn_name'])
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
-    p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
+    p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
     output = p.communicate()[0]
 
     if "WFLYCTL0216" in output:
@@ -19,6 +21,8 @@ def isJvmAlreadyCreated(data):
 def jvm_present(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
     exists = isJvmAlreadyCreated(data)
     isError = False
     hasChanged = True
@@ -26,39 +30,39 @@ def jvm_present(data):
     res =[]
 
     if not exists:
-        cli1 = "/host=%s/server-config=%s/jvm=%s:add" % (data['host'],data['server_config_name'],data['jvn_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+        cli = "/host=%s/server-config=%s/jvm=%s:add" % (data['host'],data['server_config_name'],data['jvn_name'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         res.append(result)
 
-        cli1 = "/host=%s/server-config=%s/jvm=%s:write-attribute(name=heap-size,value=%s)" % (data['host'],data['server_config_name'],data['jvn_name'],data['heap_size'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+        cli = "/host=%s/server-config=%s/jvm=%s:write-attribute(name=heap-size,value=%s)" % (data['host'],data['server_config_name'],data['jvn_name'],data['heap_size'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         res.append(result)
 
-        cli1 = "/host=%s/server-config=%s/jvm=%s:write-attribute(name=max-heap-size,value=%s)" % (data['host'],data['server_config_name'],data['jvn_name'],data['max_heap_size'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+        cli = "/host=%s/server-config=%s/jvm=%s:write-attribute(name=max-heap-size,value=%s)" % (data['host'],data['server_config_name'],data['jvn_name'],data['max_heap_size'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         res.append(result)
 
-        cli1 = "/host=%s/server-config=%s/jvm=%s:write-attribute(name=permgen-size,value=%s)" % (data['host'],data['server_config_name'],data['jvn_name'],data['permgen_size'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+        cli = "/host=%s/server-config=%s/jvm=%s:write-attribute(name=permgen-size,value=%s)" % (data['host'],data['server_config_name'],data['jvn_name'],data['permgen_size'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         res.append(result)
 
-        cli1 = "/host=%s/server-config=%s/jvm=%s:write-attribute(name=max-permgen-size,value=%s)" % (data['host'],data['server_config_name'],data['jvn_name'],data['max_permgen_size'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli1,controller], stdout=subprocess.PIPE)
+        cli = "/host=%s/server-config=%s/jvm=%s:write-attribute(name=max-permgen-size,value=%s)" % (data['host'],data['server_config_name'],data['jvn_name'],data['max_permgen_size'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         res.append(result)
 
         if data['jvm_options'] is not None:
-            cli1 = "/host=%s/server-config=%s/jvm=%s:add-jvm-option(jvm-option=%s)" % (data['host'],data['server_config_name'],data['jvn_name'],data['jvm_options'])
-            p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+            cli = "/host=%s/server-config=%s/jvm=%s:add-jvm-option(jvm-option=%s)" % (data['host'],data['server_config_name'],data['jvn_name'],data['jvm_options'])
+            p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
             result,err = p.communicate()
             res.append(result)
 
-        cli1 = "reload --host=%s" % (data['host'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+        cli = "reload --host=%s" % (data['host'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         res.append(result)
 
@@ -73,6 +77,8 @@ def jvm_present(data):
 def jvm_absent(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
+    user = "-u=%s" % (data['user'])
+    password = "-p=%s" % (data['password'])
     exists = isJvmAlreadyCreated(data)
     isError = False
     hasChanged = True
@@ -83,8 +89,8 @@ def jvm_absent(data):
         resp = "JVM %s does not exist" % (data['jvn_name'])
         meta = {"status" : "OK", "response" : resp}
     else:
-        cli1 = "/host=%s/server-config=%s/jvm=%s:remove" % (data['host'],data['server_config_name'],data['jvn_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
+        cli = "/host=%s/server-config=%s/jvm=%s:remove" % (data['host'],data['server_config_name'],data['jvn_name'])
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
         result,err = p.communicate()
         meta = {"status": "OK", "response": result}
 
@@ -138,11 +144,11 @@ def main():
             "type": "str"
         },
         "user" : {
-            "required": True
+            "required": True,
             "type": "str"
         },
         "password" : {
-            "required": True
+            "required": True,
             "type": "str"
         },
         "state": {
