@@ -6,7 +6,9 @@
         jboss_home: /Users/it-ops/Documents/java_dev/server/wildfly-10.0.0.Final/
         server_group_name: group1
         state: present
-      register: hasil
+        user: wildfly
+        password: password
+    register: hasil
 
     - debug: var=hasil
 
@@ -18,6 +20,8 @@
         server_config_name: server1
         server_socket_binding_port_offset: 20
         state: present
+        user: wildfly
+        password: password
       register: hasil
 
     - debug: var=hasil
@@ -33,6 +37,8 @@
         permgen_size: 512m
         max_permgen_size: 1024m
         state: present
+        user: wildfly
+        password: password
       register: hasil
 
     - debug: var=hasil
@@ -49,6 +55,8 @@
         artifact: demo-0.0.1-SNAPSHOT.war
         artifact_dir: /Users/it-ops/Documents/java_dev/workspaces/workspace-sandbox/vagrant-ci/sample-code/target/
         state: present
+        user: wildfly
+        password: password
       register: hasil
 
     - debug: var=hasil

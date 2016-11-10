@@ -9,6 +9,8 @@
         server_config_name: server1
         server_socket_binding_port_offset: 20
         state: start
+        user: wildfly
+        password: password
       register: hasil
 
     - debug: var=hasil

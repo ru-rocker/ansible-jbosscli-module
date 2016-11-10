@@ -9,6 +9,8 @@
         artifact: demo-0.0.1-SNAPSHOT.war
         artifact_dir: /Users/it-ops/Documents/java_dev/workspaces/workspace-sandbox/vagrant-ci/sample-code/target/
         state: absent
+        user: wildfly
+        password: password
       register: hasil
 
     - debug: var=hasil
@@ -20,6 +22,8 @@
         server_group_name: group1
         server_config_name: server1
         server_socket_binding_port_offset: 20
+        user: wildfly
+        password: password
         state: absent
       register: hasil
 
@@ -29,6 +33,8 @@
       jcli_servergroup:
         jboss_home: /Users/it-ops/Documents/java_dev/server/wildfly-10.0.0.Final/
         server_group_name: group1
+        user: wildfly
+        password: password
         state: absent
       register: hasil
 

@@ -6,6 +6,8 @@
         jboss_home: /Users/it-ops/Documents/java_dev/server/wildfly-10.0.0.Final/
         server_group_name: group1
         state: start
+        user: wildfly
+        password: password
       register: hasil
 
     - debug: var=hasil
