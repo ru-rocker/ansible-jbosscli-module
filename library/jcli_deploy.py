@@ -31,7 +31,7 @@ def deployment_present(data):
             cli1 = "deploy %s/%s" % (data['artifact_dir'],data['artifact'])
         else:
             cli1 = "deploy %s/%s --server-groups=%s" % (data['artifact_dir'],data['artifact'],data['server_group_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli1, controller], stdout=subprocess.PIPE)
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
         result,err = p.communicate()
         meta = {"status": "OK", "response": result}
     else:
@@ -100,6 +100,14 @@ def main():
         "server_mode" : {
             "required": True,
             "choices": ['standalone', 'domain'],
+            "type": "str"
+        },
+        "user" : {
+            "required": True
+            "type": "str"
+        },
+        "password" : {
+            "required": True
             "type": "str"
         },
         "state": {

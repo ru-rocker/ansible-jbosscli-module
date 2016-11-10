@@ -8,7 +8,7 @@ def isServerGroupAlreadyCreated(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     cli = "/server-group=%s:query" % (data['server_group_name'])
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
-    p = subprocess.Popen(["sh", cmd, "-c", cli, controller], stdout=subprocess.PIPE)
+    p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
     result , err = p.communicate()
 
     print(err)
@@ -28,7 +28,7 @@ def server_group_present(data):
     if not exists:
         cli1 = "/server-group=%s:add(profile=%s, socket-binding-group=%s)" % (data['server_group_name'],data['server_group_profile'],data['socket_binding_group'])
         controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli1, controller], stdout=subprocess.PIPE)
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
         result,err = p.communicate()
         meta = {"status": "OK", "response": result}
     else:
@@ -52,7 +52,7 @@ def server_group_absent(data):
     else:
         cli1 = "/server-group=%s:remove" % (data['server_group_name'])
         controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli1, controller], stdout=subprocess.PIPE)
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
         result,err = p.communicate()
         meta = {"status": "OK", "response": result}
 
@@ -68,7 +68,7 @@ def server_group_start(data):
 
     if exists:
         cli1 = "/server-group=%s:start-servers" % (data['server_group_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli1, controller], stdout=subprocess.PIPE)
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
         result,err = p.communicate()
         meta = {"status": "OK", "response": result}
     else:
@@ -88,7 +88,7 @@ def server_group_stop(data):
 
     if exists:
         cli1 = "/server-group=%s:stop-servers" % (data['server_group_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli1, controller], stdout=subprocess.PIPE)
+        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, "-u", data['user'], "-p", data['password']], stdout=subprocess.PIPE)
         result,err = p.communicate()
         meta = {"status": "OK", "response": result}
     else:
@@ -122,6 +122,14 @@ def main():
             "required": False,
             "default": 9990,
             "type": "int"
+        },
+        "user" : {
+            "required": True
+            "type": "str"
+        },
+        "password" : {
+            "required": True
+            "type": "str"
         },
         "state": {
             "default": "present",
