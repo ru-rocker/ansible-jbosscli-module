@@ -1,3 +1,7 @@
+# Ansible
+#
+*.retry
+
 ### OSX ###
 *.DS_Store
 .AppleDouble
