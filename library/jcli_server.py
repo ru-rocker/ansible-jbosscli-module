@@ -2,7 +2,6 @@
 
 from ansible.module_utils.basic import *
 import subprocess
-import json
 import time
 
 def isServerAlreadyCreated(data):
