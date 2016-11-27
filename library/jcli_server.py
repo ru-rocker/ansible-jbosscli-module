@@ -15,6 +15,7 @@ def isServerAlreadyCreated(data):
 
     created = False
     remoteExists = False
+    result = str(result,'utf-8')
 
     if "WFLYCTL0216" in result:
         created = False
@@ -47,11 +48,6 @@ def server_present(data):
     else:
         if not created:
             cli = "/host=%s/server-config=%s:add(group=%s,socket-binding-port-offset=%s,socket-binding-group=%s)" % (data['host'],data['server_config_name'],data['server_group_name'],data['server_socket_binding_port_offset'],data['server_group_socket'])
-            p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
-            result,err = p.communicate()
-            res.append(result)
-
-            cli = "/host=%s/server-config=%s:start" % (data['host'],data['server_config_name'])
             p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
             result,err = p.communicate()
             res.append(result)
@@ -92,11 +88,13 @@ def server_absent(data):
             result,err = p.communicate()
             res.append(result)
 
+            result = str(result,'utf-8')
             while not "STOPPED" in result:
                 time.sleep(0.5)
                 cli = "/host=%s/server-config=%s:stop" % (data['host'],data['server_config_name'])
                 p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
                 result = p.communicate()[0]
+                result = str(result,'utf-8')
 
             cli = "/host=%s/server-config=%s:remove" % (data['host'],data['server_config_name'])
             p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)

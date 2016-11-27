@@ -14,6 +14,7 @@ def isJvmAlreadyCreated(data):
 
     created = False
     remoteExists = False
+    result = str(result,'utf-8')
 
     if "WFLYCTL0216" in result:
         created = False

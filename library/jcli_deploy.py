@@ -14,6 +14,7 @@ def isArtifactAlreadyDeployed(data):
 
     created = False
     remoteExists = False
+    result = str(result,'utf-8')
 
     if "WFLYCTL0216" in result:
         created = False
@@ -95,6 +96,7 @@ def deployment_absent(data):
 
             p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
             result,err = p.communicate()
+            result = str(result,'utf-8')
 
             if "WFLYDC0074" in result:
                 meta = {"status" : "Failed to undeploy", "response" : result}
