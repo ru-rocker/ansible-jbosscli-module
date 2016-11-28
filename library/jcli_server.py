@@ -15,7 +15,7 @@ def isServerAlreadyCreated(data):
 
     created = False
     remoteExists = False
-    result = str(result,'utf-8')
+    result = str(result)
 
     if "WFLYCTL0216" in result:
         created = False
@@ -88,13 +88,13 @@ def server_absent(data):
             result,err = p.communicate()
             res.append(result)
 
-            result = str(result,'utf-8')
+            result = str(result)
             while not "STOPPED" in result:
                 time.sleep(0.5)
                 cli = "/host=%s/server-config=%s:stop" % (data['host'],data['server_config_name'])
                 p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
                 result = p.communicate()[0]
-                result = str(result,'utf-8')
+                result = str(result)
 
             cli = "/host=%s/server-config=%s:remove" % (data['host'],data['server_config_name'])
             p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
