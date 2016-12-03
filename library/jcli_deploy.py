@@ -58,6 +58,7 @@ def deployment_present(data):
             p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
             result,err = p.communicate()
 
+        result = str(result)
         if "WFLYDC0074" in result:
             meta = {"status" : "Failed to deploy", "response" : result}
             isError = True
